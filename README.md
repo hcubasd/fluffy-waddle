@@ -47,8 +47,6 @@ classDiagram
         +string description [0..1]
         +string url [0..1]
         +dict address [0..1]
-        +list~CRMSegment~ segments
-        +list~CRMUser~ followers
     }
     class CRMContact {
         +string organization_id [0..1]
@@ -71,6 +69,8 @@ classDiagram
     CRMPipelineStage --|> CRMNamedModel
     CRMOrganization --|> CRMNamedModel
     CRMContact --|> CRMNamedModel
+    CRMOrganization "0..*" o-- "0..*" CRMSegment : segments
+    CRMOrganization "0..*" o-- "0..*" CRMUser : followers
 ```
 
 Each class only shows fields it adds over its parent. Omitted multiplicity means `[1..1]`.
