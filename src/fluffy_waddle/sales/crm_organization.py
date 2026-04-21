@@ -5,7 +5,7 @@ from .crm_user import CRMUser
 
 
 class CRMOrganization(CRMNamedModel):
-    owner_id: Optional[str] = None
+    owner: Optional[CRMUser] = None
     description: Optional[str] = None
     url: Optional[str] = None
     address: Optional[dict] = None
