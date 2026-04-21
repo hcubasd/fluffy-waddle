@@ -36,6 +36,29 @@ classDiagram
     }
     class CRMTeam
 
+    class CRMPipelineStage {
+        +string pipeline_id
+        +string description [0..1]
+        +string objective [0..1]
+        +int display_order
+    }
+    class CRMOrganization {
+        +string owner_id [0..1]
+        +string description [0..1]
+        +string url [0..1]
+        +dict address [0..1]
+        +list~CRMSegment~ segments
+        +list~CRMUser~ followers
+    }
+    class CRMContact {
+        +string organization_id [0..1]
+        +string job_title [0..1]
+        +list emails
+        +list phones
+        +list social_profiles
+        +list legal_bases
+    }
+
     CRMNamedModel --|> CRMModel
     CRMUser --|> CRMNamedModel
     CRMCampaign --|> CRMNamedModel
@@ -45,6 +68,9 @@ classDiagram
     CRMSegment --|> CRMNamedModel
     CRMSource --|> CRMNamedModel
     CRMTeam --|> CRMNamedModel
+    CRMPipelineStage --|> CRMNamedModel
+    CRMOrganization --|> CRMNamedModel
+    CRMContact --|> CRMNamedModel
 ```
 
 Each class only shows fields it adds over its parent. Omitted multiplicity means `[1..1]`.
