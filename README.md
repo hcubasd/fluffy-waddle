@@ -116,4 +116,6 @@ classDiagram
     CRMDealNote "0..*" --> "0..1" CRMUser : edited_by
 ```
 
-Each class only shows fields it adds over its parent. Omitted multiplicity means `[1..1]`.
+Each class only shows fields it adds over its parent. Omitted multiplicity means `[1..1]`. `CRMDealNote` inherits from Pydantic's `BaseModel` directly (not `CRMModel`) because the `deal_notes` table has no `updated_at` column.
+
+> **Tip:** GitHub renders this with dagre and the layout gets crowded. For a clearer view, paste the diagram into the Mermaid Live Editor and switch the layout to ELK.
