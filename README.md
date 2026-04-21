@@ -79,6 +79,14 @@ classDiagram
         +datetime pinned_at [0..1]
         +datetime edited_at [0..1]
     }
+    class CRMTask {
+        +string deal_id [0..1]
+        +string description [0..1]
+        +string type
+        +string status
+        +datetime due_date [0..1]
+        +datetime completed_at [0..1]
+    }
 
     %% Inheritance
     CRMNamedModel --|> CRMModel
@@ -95,6 +103,7 @@ classDiagram
     CRMContact --|> CRMNamedModel
     CRMDeal --|> CRMNamedModel
     CRMDealProduct --|> CRMModel
+    CRMTask --|> CRMNamedModel
 
     %% Associations
     CRMPipelineStage "0..*" --> "1" CRMPipeline : pipeline
@@ -114,8 +123,54 @@ classDiagram
     CRMDealProduct "0..*" --> "1" CRMProduct : product
     CRMDealNote "0..*" --> "1" CRMUser : author
     CRMDealNote "0..*" --> "0..1" CRMUser : edited_by
+    CRMDeal "1" *-- "0..*" CRMTask : tasks
+    CRMTask "0..*" --> "1" CRMUser : created_by
+    CRMTask "0..*" --> "0..1" CRMUser : completed_by
+    CRMTask "0..*" o-- "0..*" CRMUser : owners
+    CRMTeam "0..*" o-- "0..*" CRMUser : members
 ```
 
-Each class only shows fields it adds over its parent. Omitted multiplicity means `[1..1]`. `CRMDealNote` inherits from Pydantic's `BaseModel` directly (not `CRMModel`) because the `deal_notes` table has no `updated_at` column.
+Each class only shows fields it adds over its parent. Omitted multiplicity means `[1..1]`. `CRMDealNote` inherits from Pydantic's `BaseModel` directly (not `CRMModel`) because the `deal_notes` table has no `updated_at` column. `CRMTask.deal_id` and `SyncCursor.connection_id` are kept as strings to avoid circular imports — navigate those relationships from the parent side.
+
+## Integrations class diagram
+
+```mermaid
+classDiagram
+    class IntegrationModel {
+        +datetime created_at
+        +datetime updated_at
+    }
+    class Connection {
+        +string id
+        +string provider
+        +string account_name
+        +string status
+        +string client_id [0..1]
+        +string client_secret [0..1]
+        +string access_token [0..1]
+        +string refresh_token [0..1]
+        +string token_type [0..1]
+        +datetime expires_at [0..1]
+        +bool reauth_required
+        +string redirect_uri [0..1]
+        +dict config
+        +datetime last_refresh_at [0..1]
+        +string last_refresh_error [0..1]
+    }
+    class SyncCursor {
+        +int id
+        +string connection_id
+        +string resource
+        +string cursor_type
+        +dict cursor
+        +datetime last_sync_at [0..1]
+        +string last_sync_status [0..1]
+        +string last_error [0..1]
+    }
+
+    Connection --|> IntegrationModel
+    SyncCursor --|> IntegrationModel
+    Connection "1" *-- "0..*" SyncCursor : sync_cursors
+```
 
 > **Tip:** GitHub renders this with dagre and the layout gets crowded. For a clearer view, paste the diagram into the Mermaid Live Editor and switch the layout to ELK.

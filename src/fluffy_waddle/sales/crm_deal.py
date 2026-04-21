@@ -11,6 +11,7 @@ from .crm_organization import CRMOrganization
 from .crm_contact import CRMContact
 from .crm_deal_product import CRMDealProduct
 from .crm_deal_note import CRMDealNote
+from .crm_task import CRMTask
 
 
 class CRMDeal(CRMNamedModel):
@@ -31,3 +32,4 @@ class CRMDeal(CRMNamedModel):
     contacts: list[CRMContact] = []
     products: list[CRMDealProduct] = []
     notes: list[CRMDealNote] = []
+    tasks: list[CRMTask] = []
