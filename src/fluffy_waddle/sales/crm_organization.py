@@ -1,13 +1,14 @@
-from typing import Optional
+from typing import Any
+from pydantic import Field
 from .crm_named_model import CRMNamedModel
-from .crm_segment import CRMSegment
+from .crm_industry import CRMIndustry
 from .crm_user import CRMUser
 
 
 class CRMOrganization(CRMNamedModel):
-    owner: Optional[CRMUser] = None
-    description: Optional[str] = None
-    url: Optional[str] = None
-    address: Optional[dict] = None
-    segments: list[CRMSegment] = []
-    followers: list[CRMUser] = []
+    owner: CRMUser | None = None
+    description: str | None = None
+    url: str | None = None
+    address: dict[str, Any] | None = None
+    industries: list[CRMIndustry] = Field(default_factory=list)
+    followers: list[CRMUser] = Field(default_factory=list)

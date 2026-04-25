@@ -1,14 +1,14 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any
+from pydantic import Field
 from .integration_model import IntegrationModel
 
 
 class SyncCursor(IntegrationModel):
     id: int
-    connection_id: str
     resource: str
     cursor_type: str
-    cursor: dict = {}
-    last_sync_at: Optional[datetime] = None
-    last_sync_status: Optional[str] = None
-    last_error: Optional[str] = None
+    cursor: dict[str, Any] = Field(default_factory=dict)
+    last_sync_at: datetime | None = None
+    last_sync_status: str | None = None
+    last_error: str | None = None

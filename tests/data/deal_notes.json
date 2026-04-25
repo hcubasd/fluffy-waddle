@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "id": "string",
+      "description": "string",
+      "user_id": "string",
+      "registered_at": "2026-04-24T22:09:05.006Z",
+      "pinned_at": "2026-04-24T22:09:05.006Z",
+      "edited_by_id": "string",
+      "edited_at": "2026-04-24T22:09:05.006Z"
+    }
+  ],
+  "links": {
+    "first": "string",
+    "prev": "string",
+    "self": "string",
+    "next": "string",
+    "last": "string"
+  }
+}

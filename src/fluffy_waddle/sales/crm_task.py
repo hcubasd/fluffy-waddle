@@ -1,16 +1,15 @@
 from datetime import datetime
-from typing import Optional
+from pydantic import Field
 from .crm_named_model import CRMNamedModel
 from .crm_user import CRMUser
 
 
 class CRMTask(CRMNamedModel):
     created_by: CRMUser
-    completed_by: Optional[CRMUser] = None
-    deal_id: Optional[str] = None
-    description: Optional[str] = None
+    completed_by: CRMUser | None = None
+    description: str | None = None
     type: str
     status: str
-    due_date: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    owners: list[CRMUser] = []
+    due_date: datetime | None = None
+    completed_at: datetime | None = None
+    assignees: list[CRMUser] = Field(default_factory=list)

@@ -2,7 +2,9 @@
 
 Shared Pydantic data model for the **modest-galois** project. All Python workers (CRM sync, and future WMS, TMS, ERP integrations) import from this package.
 
-## Class diagram
+This package stays intentionally **domain-first**: it models nested business objects, not database rows. Names track the database entities, but the public API is a graph of related classes with inheritance and aggregate roots.
+
+## Sales class diagram
 
 ```mermaid
 classDiagram
@@ -21,7 +23,7 @@ classDiagram
     class CRMCampaign {
         +string description [0..1]
     }
-    class CRMLostReason
+    class CRMLossReason
     class CRMPipeline {
         +int display_order
     }
@@ -30,7 +32,7 @@ classDiagram
         +bool visible
         +string description [0..1]
     }
-    class CRMSegment
+    class CRMIndustry
     class CRMSource {
         +string description [0..1]
     }
@@ -63,7 +65,6 @@ classDiagram
         +dict distribution_settings [0..1]
     }
     class CRMDealProduct {
-        +string deal_id
         +Decimal price
         +Decimal quantity
         +string discount_type [0..1]
@@ -73,14 +74,12 @@ classDiagram
     }
     class CRMDealNote {
         +string id
-        +string deal_id
         +string description
         +datetime created_at
         +datetime pinned_at [0..1]
         +datetime edited_at [0..1]
     }
     class CRMTask {
-        +string deal_id [0..1]
         +string description [0..1]
         +string type
         +string status
@@ -92,10 +91,10 @@ classDiagram
     CRMNamedModel --|> CRMModel
     CRMUser --|> CRMNamedModel
     CRMCampaign --|> CRMNamedModel
-    CRMLostReason --|> CRMNamedModel
+    CRMLossReason --|> CRMNamedModel
     CRMPipeline --|> CRMNamedModel
     CRMProduct --|> CRMNamedModel
-    CRMSegment --|> CRMNamedModel
+    CRMIndustry --|> CRMNamedModel
     CRMSource --|> CRMNamedModel
     CRMTeam --|> CRMNamedModel
     CRMPipelineStage --|> CRMNamedModel
@@ -108,14 +107,14 @@ classDiagram
     %% Associations
     CRMPipelineStage "0..*" --> "1" CRMPipeline : pipeline
     CRMOrganization "0..*" --> "0..1" CRMUser : owner
-    CRMOrganization "0..*" o-- "0..*" CRMSegment : segments
+    CRMOrganization "0..*" o-- "0..*" CRMIndustry : industries
     CRMOrganization "0..*" o-- "0..*" CRMUser : followers
     CRMContact "0..*" --> "0..1" CRMOrganization : organization
     CRMDeal "0..*" --> "1" CRMPipelineStage : stage
     CRMDeal "0..*" --> "0..1" CRMUser : owner
     CRMDeal "0..*" --> "0..1" CRMSource : source
     CRMDeal "0..*" --> "0..1" CRMCampaign : campaign
-    CRMDeal "0..*" --> "0..1" CRMLostReason : lost_reason
+    CRMDeal "0..*" --> "0..1" CRMLossReason : loss_reason
     CRMDeal "0..*" --> "0..1" CRMOrganization : organization
     CRMDeal "0..*" o-- "0..*" CRMContact : contacts
     CRMDeal "1" *-- "0..*" CRMDealProduct : products
@@ -126,11 +125,13 @@ classDiagram
     CRMDeal "1" *-- "0..*" CRMTask : tasks
     CRMTask "0..*" --> "1" CRMUser : created_by
     CRMTask "0..*" --> "0..1" CRMUser : completed_by
-    CRMTask "0..*" o-- "0..*" CRMUser : owners
+    CRMTask "0..*" o-- "0..*" CRMUser : assignees
     CRMTeam "0..*" o-- "0..*" CRMUser : members
 ```
 
-Each class only shows fields it adds over its parent. Omitted multiplicity means `[1..1]`. `CRMDealNote` inherits from Pydantic's `BaseModel` directly (not `CRMModel`) because the `deal_notes` table has no `updated_at` column. `CRMTask.deal_id` and `SyncCursor.connection_id` are kept as strings to avoid circular imports — navigate those relationships from the parent side.
+`CRMDeal` is the main aggregate root for the sales graph. Child objects nested under a deal (`products`, `notes`, `tasks`) intentionally do **not** carry backreference IDs to the parent deal; workers should navigate outward from the deal graph instead.
+
+`CRMDealNote` inherits from Pydantic's `BaseModel` directly instead of `CRMModel` because the database entity has no `updated_at` field.
 
 ## Integrations class diagram
 
@@ -159,7 +160,6 @@ classDiagram
     }
     class SyncCursor {
         +int id
-        +string connection_id
         +string resource
         +string cursor_type
         +dict cursor
@@ -172,5 +172,7 @@ classDiagram
     SyncCursor --|> IntegrationModel
     Connection "1" *-- "0..*" SyncCursor : sync_cursors
 ```
+
+`Connection` is the aggregate root for integrations. `SyncCursor` objects are nested underneath it, so the public model avoids a `connection_id` backreference.
 
 > **Tip:** GitHub renders this with dagre and the layout gets crowded. For a clearer view, paste the diagram into the Mermaid Live Editor and switch the layout to ELK.
