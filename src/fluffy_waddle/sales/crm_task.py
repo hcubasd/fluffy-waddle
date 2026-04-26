@@ -3,7 +3,6 @@ from pydantic import Field
 from .crm_named_model import CRMNamedModel
 from .crm_user import CRMUser
 
-
 class CRMTask(CRMNamedModel):
     created_by: CRMUser
     completed_by: CRMUser | None = None

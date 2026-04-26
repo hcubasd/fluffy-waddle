@@ -3,7 +3,6 @@ from typing import Any
 from pydantic import Field
 from .integration_model import IntegrationModel
 
-
 class SyncCursor(IntegrationModel):
     id: int
     resource: str

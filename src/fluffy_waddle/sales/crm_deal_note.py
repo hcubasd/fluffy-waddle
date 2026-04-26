@@ -2,7 +2,6 @@ from datetime import datetime
 from pydantic import BaseModel
 from .crm_user import CRMUser
 
-
 class CRMDealNote(BaseModel):
     id: str
     author: CRMUser

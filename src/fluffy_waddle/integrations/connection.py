@@ -4,7 +4,6 @@ from pydantic import Field
 from .integration_model import IntegrationModel
 from .sync_cursor import SyncCursor
 
-
 class Connection(IntegrationModel):
     id: str
     provider: str

@@ -14,7 +14,7 @@ classDiagram
         +datetime updated_at
     }
     class CRMNamedModel {
-        +string name [0..1]
+        +string name
     }
     class CRMUser {
         +string email [0..1]
@@ -29,7 +29,6 @@ classDiagram
     }
     class CRMProduct {
         +Decimal price
-        +bool visible
         +string description [0..1]
     }
     class CRMIndustry
@@ -52,17 +51,12 @@ classDiagram
         +list emails
         +list phones
         +list social_profiles
-        +list legal_bases
     }
     class CRMDeal {
-        +Decimal recurrence_price
-        +Decimal one_time_price
-        +Decimal total_price
         +date expected_close_date [0..1]
         +int rating [0..1]
         +string status
         +datetime closed_at [0..1]
-        +dict distribution_settings [0..1]
     }
     class CRMDealProduct {
         +Decimal price
@@ -109,7 +103,7 @@ classDiagram
     CRMOrganization "0..*" --> "0..1" CRMUser : owner
     CRMOrganization "0..*" o-- "0..*" CRMIndustry : industries
     CRMOrganization "0..*" o-- "0..*" CRMUser : followers
-    CRMContact "0..*" --> "0..1" CRMOrganization : organization
+    CRMOrganization "1" *-- "0..*" CRMContact : contacts
     CRMDeal "0..*" --> "1" CRMPipelineStage : stage
     CRMDeal "0..*" --> "0..1" CRMUser : owner
     CRMDeal "0..*" --> "0..1" CRMSource : source
@@ -117,7 +111,7 @@ classDiagram
     CRMDeal "0..*" --> "0..1" CRMLossReason : loss_reason
     CRMDeal "0..*" --> "0..1" CRMOrganization : organization
     CRMDeal "0..*" o-- "0..*" CRMContact : contacts
-    CRMDeal "1" *-- "0..*" CRMDealProduct : products
+    CRMDeal "1" *-- "0..*" CRMDealProduct : deal_products
     CRMDeal "1" *-- "0..*" CRMDealNote : notes
     CRMDealProduct "0..*" --> "1" CRMProduct : product
     CRMDealNote "0..*" --> "1" CRMUser : author
@@ -129,7 +123,7 @@ classDiagram
     CRMTeam "0..*" o-- "0..*" CRMUser : members
 ```
 
-`CRMDeal` is the main aggregate root for the sales graph. Child objects nested under a deal (`products`, `notes`, `tasks`) intentionally do **not** carry backreference IDs to the parent deal; workers should navigate outward from the deal graph instead.
+`CRMDeal` is the main aggregate root for the sales graph. Child objects nested under a deal (`deal_products`, `notes`, `tasks`) intentionally do **not** carry backreference IDs to the parent deal; workers should navigate outward from the deal graph instead.
 
 `CRMDealNote` inherits from Pydantic's `BaseModel` directly instead of `CRMModel` because the database entity has no `updated_at` field.
 
