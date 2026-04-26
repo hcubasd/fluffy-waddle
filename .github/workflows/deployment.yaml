@@ -1,0 +1,19 @@
+name: Deployment
+on:
+  push:
+    tags:
+      - "v*.*.*"
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/fluffy-waddle
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - run: pip install hatch && hatch build
+      - uses: pypa/gh-action-pypi-publish@release/v1
