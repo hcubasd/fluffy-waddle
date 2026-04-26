@@ -11,9 +11,11 @@ jobs:
       url: https://pypi.org/p/fluffy-waddle
     permissions:
       id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - run: pip install hatch && hatch build
       - uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: softprops/action-gh-release@v3
