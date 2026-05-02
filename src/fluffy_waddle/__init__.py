@@ -1,4 +1,3 @@
-from .integrations import Connection, IntegrationModel, SyncCursor
 from .sales import (
     CRMCampaign,
     CRMContact,
@@ -18,9 +17,6 @@ from .sales import (
 )
 
 __all__ = [
-    "Connection",
-    "IntegrationModel",
-    "SyncCursor",
     "CRMCampaign",
     "CRMContact",
     "CRMDeal",

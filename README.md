@@ -107,50 +107,6 @@ classDiagram
 
 `CRMDeal` is the main aggregate root for the sales graph. Child objects nested under a deal (`tasks`) intentionally do **not** carry backreference IDs to the parent deal; workers should navigate outward from the deal graph instead.
 
-## Integrations class diagram
-
-```mermaid
-classDiagram
-    class IntegrationModel {
-        +datetime created_at
-        +datetime updated_at
-    }
-    class Connection {
-        +string id
-        +string provider
-        +string account_name
-        +string status
-        +string client_id [0..1]
-        +string client_secret [0..1]
-        +string access_token [0..1]
-        +string refresh_token [0..1]
-        +string token_type [0..1]
-        +datetime expires_at [0..1]
-        +bool reauth_required
-        +string redirect_uri [0..1]
-        +dict config
-        +datetime last_refresh_at [0..1]
-        +string last_refresh_error [0..1]
-    }
-    class SyncCursor {
-        +int id
-        +string resource
-        +string cursor_type
-        +dict cursor
-        +datetime last_sync_at [0..1]
-        +string last_sync_status [0..1]
-        +string last_error [0..1]
-    }
-
-    Connection --|> IntegrationModel
-    SyncCursor --|> IntegrationModel
-    Connection "1" *-- "0..*" SyncCursor : sync_cursors
-```
-
-`Connection` is the aggregate root for integrations. `SyncCursor` objects are nested underneath it, so the public model avoids a `connection_id` backreference.
-
-> **Tip:** GitHub renders this with dagre and the layout gets crowded. For a clearer view, paste the diagram into the Mermaid Live Editor and switch the layout to ELK.
-
 ## Testing
 
 Tests validate the full insert/assemble roundtrip against a live Postgres database seeded with JSON fixtures.
