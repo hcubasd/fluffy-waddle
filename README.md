@@ -183,3 +183,10 @@ tests/
 ```
 
 `CRMDeal` is the aggregate root tested here. The roundtrip covers the full sales graph: pipelines, stages, organizations, contacts, products, tasks, teams, users, and all bridge tables.
+
+## Scripts
+
+Helper scripts for setting up a development environment on a new machine:
+
+- `scripts/config-helix.sh` — configures the Helix editor for this project's stack
+- `scripts/install-requirements.sh` — installs Python dependencies and the package in editable mode
