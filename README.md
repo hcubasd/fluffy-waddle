@@ -19,6 +19,7 @@ classDiagram
     class CRMUser {
         +string email [0..1]
         +string phone [0..1]
+        +CRMTeam team [0..1]
     }
     class CRMCampaign {
         +string description [0..1]
@@ -53,25 +54,11 @@ classDiagram
         +list social_profiles
     }
     class CRMDeal {
+        +Decimal value [0..1]
         +date expected_close_date [0..1]
         +int rating [0..1]
         +string status
         +datetime closed_at [0..1]
-    }
-    class CRMDealProduct {
-        +Decimal price
-        +Decimal quantity
-        +string discount_type [0..1]
-        +Decimal discount
-        +Decimal total_price
-        +string billing_frequency [0..1]
-    }
-    class CRMDealNote {
-        +string id
-        +string description
-        +datetime created_at
-        +datetime pinned_at [0..1]
-        +datetime edited_at [0..1]
     }
     class CRMTask {
         +string description [0..1]
@@ -95,7 +82,6 @@ classDiagram
     CRMOrganization --|> CRMNamedModel
     CRMContact --|> CRMNamedModel
     CRMDeal --|> CRMNamedModel
-    CRMDealProduct --|> CRMModel
     CRMTask --|> CRMNamedModel
 
     %% Associations
@@ -111,21 +97,15 @@ classDiagram
     CRMDeal "0..*" --> "0..1" CRMLossReason : loss_reason
     CRMDeal "0..*" --> "0..1" CRMOrganization : organization
     CRMDeal "0..*" o-- "0..*" CRMContact : contacts
-    CRMDeal "1" *-- "0..*" CRMDealProduct : deal_products
-    CRMDeal "1" *-- "0..*" CRMDealNote : notes
-    CRMDealProduct "0..*" --> "1" CRMProduct : product
-    CRMDealNote "0..*" --> "1" CRMUser : author
-    CRMDealNote "0..*" --> "0..1" CRMUser : edited_by
+    CRMDeal "0..*" o-- "0..*" CRMProduct : products
     CRMDeal "1" *-- "0..*" CRMTask : tasks
     CRMTask "0..*" --> "1" CRMUser : created_by
     CRMTask "0..*" --> "0..1" CRMUser : completed_by
     CRMTask "0..*" o-- "0..*" CRMUser : assignees
-    CRMTeam "0..*" o-- "0..*" CRMUser : members
+    CRMUser "0..*" --> "0..1" CRMTeam : team
 ```
 
-`CRMDeal` is the main aggregate root for the sales graph. Child objects nested under a deal (`deal_products`, `notes`, `tasks`) intentionally do **not** carry backreference IDs to the parent deal; workers should navigate outward from the deal graph instead.
-
-`CRMDealNote` inherits from Pydantic's `BaseModel` directly instead of `CRMModel` because the database entity has no `updated_at` field.
+`CRMDeal` is the main aggregate root for the sales graph. Child objects nested under a deal (`tasks`) intentionally do **not** carry backreference IDs to the parent deal; workers should navigate outward from the deal graph instead.
 
 ## Integrations class diagram
 
@@ -170,3 +150,36 @@ classDiagram
 `Connection` is the aggregate root for integrations. `SyncCursor` objects are nested underneath it, so the public model avoids a `connection_id` backreference.
 
 > **Tip:** GitHub renders this with dagre and the layout gets crowded. For a clearer view, paste the diagram into the Mermaid Live Editor and switch the layout to ELK.
+
+## Testing
+
+Tests validate the full insert/assemble roundtrip against a live Postgres database seeded with JSON fixtures.
+
+Spin up the database and run migrations (uses `curly-spoon` to apply the full schema):
+
+```bash
+docker compose up -d
+```
+
+Then run pytest from inside the `app` container:
+
+```bash
+pytest tests/
+```
+
+The `app` service mounts the repo at `/root/app` and loads `.env` (Postgres connection vars) automatically.
+
+### Test structure
+
+```
+tests/
+  data/           # JSON fixture files (one per entity type)
+  map_makers.py   # builds domain models from raw fixture data
+  inserter.py     # writes domain models to the DB
+  selector.py     # reads raw rows back from the DB
+  assembler.py    # reassembles domain models from raw rows
+  deals_repository.py  # aggregate read/write repository for the deals graph
+  test_deals.py   # roundtrip: insert fixtures → fetch → assert equality
+```
+
+`CRMDeal` is the aggregate root tested here. The roundtrip covers the full sales graph: pipelines, stages, organizations, contacts, products, tasks, teams, users, and all bridge tables.

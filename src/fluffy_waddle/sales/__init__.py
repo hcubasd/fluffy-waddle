@@ -1,8 +1,6 @@
 from .crm_campaign import CRMCampaign
 from .crm_contact import CRMContact
 from .crm_deal import CRMDeal
-from .crm_deal_note import CRMDealNote
-from .crm_deal_product import CRMDealProduct
 from .crm_industry import CRMIndustry
 from .crm_loss_reason import CRMLossReason
 from .crm_model import CRMModel
@@ -20,8 +18,6 @@ __all__ = [
     "CRMCampaign",
     "CRMContact",
     "CRMDeal",
-    "CRMDealNote",
-    "CRMDealProduct",
     "CRMIndustry",
     "CRMLossReason",
     "CRMModel",

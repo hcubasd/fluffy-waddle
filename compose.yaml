@@ -10,7 +10,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/18/docker
   migrations:
-    image: ghcr.io/hcubasd/curly-spoon:0.1.2
+    image: ghcr.io/hcubasd/curly-spoon:0.1.4
     depends_on:
       db:
         condition: service_healthy
@@ -23,6 +23,8 @@ services:
     depends_on:
       migrations:
         condition: service_completed_successfully
+    env_file:
+      - .env
     volumes:
       - .:/root/app
     command: sleep infinity
