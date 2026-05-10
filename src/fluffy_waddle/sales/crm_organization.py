@@ -4,6 +4,7 @@ from .crm_industry import CRMIndustry
 from .crm_user import CRMUser
 from .crm_contact import CRMContact
 
+
 class CRMOrganization(CRMNamedModel):
     owner: CRMUser | None = None
     description: str | None = None

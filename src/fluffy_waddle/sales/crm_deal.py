@@ -12,6 +12,7 @@ from .crm_source import CRMSource
 from .crm_task import CRMTask
 from .crm_user import CRMUser
 
+
 class CRMDeal(CRMNamedModel):
     stage: CRMPipelineStage
     owner: CRMUser | None = None

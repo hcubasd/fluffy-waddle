@@ -1,10 +1,6 @@
-import psycopg
-
 from fluffy_waddle import (
-    CRMContact,
     CRMDeal,
     CRMOrganization,
-    CRMPipeline,
     CRMPipelineStage,
     CRMTask,
     CRMTeam,
@@ -13,12 +9,12 @@ from fluffy_waddle import (
 
 
 def assemble_leaf_map(Model, rows):
-    return {r["id"]: Model(**r) for r in rows}
+    return {r["id"]: Model.model_validate(r) for r in rows}
 
 
 def assemble_user_map(users_rows, teams_rows, teams_users_rows):
     try:
-        teams = {r["id"]: CRMTeam(**r) for r in teams_rows}
+        teams = {r["id"]: CRMTeam.model_validate(r) for r in teams_rows}
 
         user_team_map = {
             r["user_id"]: teams[r["team_id"]]
@@ -27,7 +23,7 @@ def assemble_user_map(users_rows, teams_rows, teams_users_rows):
         }
 
         return {
-            r["id"]: CRMUser(**{**r, "team": user_team_map.get(r["id"])})
+            r["id"]: CRMUser.model_validate({**r, "team": user_team_map.get(r["id"])})
             for r in users_rows
         }
     except Exception as e:
@@ -37,8 +33,8 @@ def assemble_user_map(users_rows, teams_rows, teams_users_rows):
 def assemble_pipeline_stage_map(rows, pipeline_map):
     try:
         return {
-            r["id"]: CRMPipelineStage(
-                **{**r, "pipeline": pipeline_map[r["pipeline_id"]]}
+            r["id"]: CRMPipelineStage.model_validate(
+                {**r, "pipeline": pipeline_map[r["pipeline_id"]]}
             )
             for r in rows
         }
@@ -78,8 +74,8 @@ def assemble_organization_map(
                 )
 
         return {
-            r["id"]: CRMOrganization(
-                **{
+            r["id"]: CRMOrganization.model_validate(
+                {
                     **r,
                     "owner": users_map.get(r["owner_id"]) if r["owner_id"] else None,
                     "industries": org_industries.get(r["id"], []),
@@ -128,8 +124,8 @@ def assemble_tasks_by_deal_map(tasks_rows, users_map, tasks_users_rows):
 
         tasks_by_deal: dict[str, list] = {}
         for r in tasks_rows:
-            t = CRMTask(
-                **{
+            t = CRMTask.model_validate(
+                {
                     **r,
                     "created_by": users_map[r["created_by_id"]],
                     "completed_by": users_map.get(r["completed_by_id"])
@@ -160,8 +156,8 @@ def assemble_deal_map(
 ):
     try:
         deals = [
-            CRMDeal(
-                **{
+            CRMDeal.model_validate(
+                {
                     **r,
                     "stage": pipeline_stage_map[r["stage_id"]],
                     "owner": users_map.get(r["owner_id"]) if r["owner_id"] else None,

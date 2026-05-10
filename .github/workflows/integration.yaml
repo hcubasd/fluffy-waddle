@@ -9,7 +9,4 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: docker compose up --wait
-      - run: docker compose exec -T -w /root/app app bash -c "python -m venv ~/.venv
-          && . ~/.venv/bin/activate
-          && . scripts/install-requirements.sh
-          && pytest"
+      - run: docker compose exec -T -w /root/app app bash -c ". scripts/integrate.sh"
