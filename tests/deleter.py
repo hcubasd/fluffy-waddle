@@ -1,8 +1,9 @@
 import psycopg
+from psycopg import sql
 
 
-def delete_all(cur: psycopg.Cursor):
-    for table in [
+def delete_all(cur: psycopg.Cursor) -> None:
+    for table in (
         "crm_tasks_users",
         "crm_teams_users",
         "crm_organizations_users",
@@ -22,5 +23,5 @@ def delete_all(cur: psycopg.Cursor):
         "crm_loss_reasons",
         "crm_products",
         "crm_industries",
-    ]:
-        cur.execute(f"DELETE FROM sales.{table}")
+    ):
+        cur.execute(sql.SQL("DELETE FROM sales.{}").format(sql.Identifier(table)))
