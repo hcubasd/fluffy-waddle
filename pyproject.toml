@@ -1,6 +1,6 @@
 [project]
 name = "fluffy-waddle"
-description = ""
+description = "Shared Pydantic data models for mlclogistica.app"
 readme = "README.md"
 requires-python = ">=3.11, <3.15"
 authors = [
