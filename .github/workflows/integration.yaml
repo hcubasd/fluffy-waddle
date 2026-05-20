@@ -6,6 +6,11 @@ on:
 jobs:
   integrate:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11.0, 3.12.0, 3.13.0, 3.14.0]
+    container:
+      image: python:${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v6
       - run: docker compose up --wait

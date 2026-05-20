@@ -23,10 +23,10 @@ from deals_repository import DealsRepository
 
 _NOW = datetime(2024, 1, 1, tzinfo=timezone.utc)
 
-_team = CRMTeam(id="t1", name="Sales", created_at=_NOW, updated_at=_NOW)
+_team = CRMTeam(id="t1", title="Sales", created_at=_NOW, updated_at=_NOW)
 _user = CRMUser(
     id="u1",
-    name="Alice",
+    full_name="Alice",
     email="alice@example.com",
     phone=None,
     team=_team,
@@ -34,11 +34,11 @@ _user = CRMUser(
     updated_at=_NOW,
 )
 _pipeline = CRMPipeline(
-    id="pl1", name="Main", display_order=1, created_at=_NOW, updated_at=_NOW
+    id="pl1", title="Main", display_order=1, created_at=_NOW, updated_at=_NOW
 )
 _stage = CRMPipelineStage(
     id="ps1",
-    name="Proposal",
+    title="Proposal",
     pipeline=_pipeline,
     display_order=1,
     description=None,
@@ -46,31 +46,31 @@ _stage = CRMPipelineStage(
     created_at=_NOW,
     updated_at=_NOW,
 )
-_industry = CRMIndustry(id="ind1", name="Tech", created_at=_NOW, updated_at=_NOW)
+_industry = CRMIndustry(id="ind1", title="Tech", created_at=_NOW, updated_at=_NOW)
 _source = CRMSource(
-    id="src1", name="Web", description=None, created_at=_NOW, updated_at=_NOW
+    id="src1", title="Web", description=None, created_at=_NOW, updated_at=_NOW
 )
 _campaign = CRMCampaign(
-    id="cmp1", name="Q1", description=None, created_at=_NOW, updated_at=_NOW
+    id="cmp1", title="Q1", description=None, created_at=_NOW, updated_at=_NOW
 )
-_loss_reason = CRMLossReason(id="lr1", name="Price", created_at=_NOW, updated_at=_NOW)
+_loss_reason = CRMLossReason(id="lr1", reason="Price", created_at=_NOW, updated_at=_NOW)
 _product = CRMProduct(
     id="pr1",
-    name="Widget",
+    title="Widget",
     description=None,
     price=Decimal("99.99"),
     created_at=_NOW,
     updated_at=_NOW,
 )
 _contact = CRMContact(
-    id="ct1", name="Bob", job_title="CEO", created_at=_NOW, updated_at=_NOW
+    id="ct1", full_name="Bob", job_title="CEO", created_at=_NOW, updated_at=_NOW
 )
 _org = CRMOrganization(
     id="org1",
-    name="Acme",
+    title="Acme",
     owner=_user,
     description=None,
-    url=None,
+    website=None,
     address=None,
     industries=[_industry],
     followers=[_user],
@@ -80,8 +80,8 @@ _org = CRMOrganization(
 )
 _task = CRMTask(
     id="tk1",
-    name="Follow up",
-    type="call",
+    title="Follow up",
+    task_type="call",
     status="pending",
     created_by=_user,
     completed_by=None,
@@ -96,14 +96,14 @@ _task = CRMTask(
 DEALS = [
     CRMDeal(
         id="d1",
-        name="Big Deal",
+        title="Big Deal",
         stage=_stage,
         owner=_user,
         source=_source,
         campaign=_campaign,
         loss_reason=_loss_reason,
         organization=_org,
-        value=Decimal("10000.00"),
+        amount=Decimal("10000.00"),
         expected_close_date=date(2024, 3, 31),
         rating=3,
         status="ongoing",
