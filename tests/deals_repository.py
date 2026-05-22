@@ -22,7 +22,7 @@ from deals_assembler import (
     assemble_tasks_by_deal_map,
     assemble_user_map,
 )
-from deleter import delete_all
+from truncator import truncate_all
 from inserters import (
     all_users,
     insert_contacts,
@@ -48,7 +48,7 @@ class DealsRepository:
     def add_deals(self, deals: list[CRMDeal]) -> None:
         with self.conn.transaction():
             with self.conn.cursor() as cur:
-                delete_all(cur)
+                truncate_all(cur)
 
                 users = list(all_users(deals))
 
