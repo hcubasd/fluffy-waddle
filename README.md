@@ -1,6 +1,6 @@
 # fluffy-waddle
 
-Shared Pydantic data model for the **[mlclogistica.app](https://mlclogistica.app)** project. All Python workers (CRM sync, and future WMS, TMS, ERP integrations) import from this package.
+Shared Pydantic data model for the dashboard project of **[mlclogistica.app](https://mlclogistica.app)**. All Python workers (CRM sync, and future WMS, TMS, ERP integrations) import from this package.
 
 This package stays intentionally **domain-first**: it models nested business objects, not database rows. Names track the database entities, but the public API is a graph of related classes with inheritance and aggregate roots.
 
