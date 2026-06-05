@@ -137,7 +137,7 @@ tests/
   db_selectors.py      # reads raw rows back from the DB
   deals_assembler.py   # reassembles domain models from raw rows
   deals_repository.py  # aggregate read/write repository for the deals graph
-  deleter.py           # truncates all sales tables between test runs
+  truncator.py         # truncates all sales tables between test runs
   test_roundtrip.py    # roundtrip: insert fixtures → fetch → assert equality
 ```
 
@@ -147,6 +147,6 @@ tests/
 
 Helper scripts for setting up a development environment on a new machine:
 
-- `scripts/config-helix.sh` — configures the Helix editor for this project's stack
+- `scripts/config-helix.sh` — installs the Helix language servers and formatters used here for Bash, TOML, YAML, Docker Compose, and Python
 - `scripts/install-requirements.sh` — installs Python dependencies and the package in editable mode
 - `scripts/integrate.sh` — sets up a venv, installs all dependencies, and runs the full test suite
