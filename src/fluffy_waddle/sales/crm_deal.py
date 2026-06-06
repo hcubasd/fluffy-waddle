@@ -20,7 +20,7 @@ class CRMDeal(CRMNamedModel):
     campaign: CRMCampaign | None = None
     loss_reason: CRMLossReason | None = None
     organization: CRMOrganization | None = None
-    value: Decimal | None = None
+    amount: Decimal | None = None
     expected_close_date: date | None = None
     rating: int | None = None
     status: str

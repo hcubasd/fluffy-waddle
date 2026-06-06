@@ -8,7 +8,7 @@ class CRMTask(CRMNamedModel):
     created_by: CRMUser
     completed_by: CRMUser | None = None
     description: str | None = None
-    type: str
+    task_type: str
     status: str
     due_date: datetime | None = None
     completed_at: datetime | None = None

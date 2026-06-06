@@ -1,5 +1,5 @@
-from .crm_named_model import CRMNamedModel
+from .crm_model import CRMModel
 
 
-class CRMLossReason(CRMNamedModel):
-    pass
+class CRMLossReason(CRMModel):
+    reason: str

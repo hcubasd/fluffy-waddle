@@ -1,6 +1,6 @@
 # fluffy-waddle
 
-Shared Pydantic data model for the **modest-galois** project. All Python workers (CRM sync, and future WMS, TMS, ERP integrations) import from this package.
+Shared Pydantic data model for the dashboard project of **[mlclogistica.app](https://mlclogistica.app)**. All Python workers (CRM sync, and future WMS, TMS, ERP integrations) import from this package.
 
 This package stays intentionally **domain-first**: it models nested business objects, not database rows. Names track the database entities, but the public API is a graph of related classes with inheritance and aggregate roots.
 
@@ -14,9 +14,10 @@ classDiagram
         +datetime updated_at
     }
     class CRMNamedModel {
-        +string name
+        +string title
     }
     class CRMUser {
+        +string full_name
         +string email [0..1]
         +string phone [0..1]
         +CRMTeam team [0..1]
@@ -24,7 +25,9 @@ classDiagram
     class CRMCampaign {
         +string description [0..1]
     }
-    class CRMLossReason
+    class CRMLossReason {
+        +string reason
+    }
     class CRMPipeline {
         +int display_order
     }
@@ -44,17 +47,18 @@ classDiagram
     }
     class CRMOrganization {
         +string description [0..1]
-        +string url [0..1]
+        +string website [0..1]
         +dict address [0..1]
     }
     class CRMContact {
+        +string full_name
         +string job_title [0..1]
         +list emails
         +list phones
         +list social_profiles
     }
     class CRMDeal {
-        +Decimal value [0..1]
+        +Decimal amount [0..1]
         +date expected_close_date [0..1]
         +int rating [0..1]
         +string status
@@ -62,7 +66,7 @@ classDiagram
     }
     class CRMTask {
         +string description [0..1]
-        +string type
+        +string task_type
         +string status
         +datetime due_date [0..1]
         +datetime completed_at [0..1]
@@ -70,9 +74,10 @@ classDiagram
 
     %% Inheritance
     CRMNamedModel --|> CRMModel
-    CRMUser --|> CRMNamedModel
+    CRMUser --|> CRMModel
+    CRMContact --|> CRMModel
+    CRMLossReason --|> CRMModel
     CRMCampaign --|> CRMNamedModel
-    CRMLossReason --|> CRMNamedModel
     CRMPipeline --|> CRMNamedModel
     CRMProduct --|> CRMNamedModel
     CRMIndustry --|> CRMNamedModel
@@ -80,7 +85,6 @@ classDiagram
     CRMTeam --|> CRMNamedModel
     CRMPipelineStage --|> CRMNamedModel
     CRMOrganization --|> CRMNamedModel
-    CRMContact --|> CRMNamedModel
     CRMDeal --|> CRMNamedModel
     CRMTask --|> CRMNamedModel
 
@@ -109,7 +113,7 @@ classDiagram
 
 ## Testing
 
-Tests validate the full insert/assemble roundtrip against a live Postgres database seeded with JSON fixtures.
+Tests validate the full insert/assemble roundtrip against a live Postgres database seeded with inline fixtures.
 
 Spin up the database and run migrations (uses `curly-spoon` to apply the full schema):
 
@@ -129,13 +133,12 @@ The `app` service mounts the repo at `/root/app` and loads `.env` (Postgres conn
 
 ```
 tests/
-  data/           # JSON fixture files (one per entity type)
-  map_makers.py   # builds domain models from raw fixture data
-  inserter.py     # writes domain models to the DB
-  selector.py     # reads raw rows back from the DB
-  assembler.py    # reassembles domain models from raw rows
+  inserters.py         # writes domain models to the DB
+  db_selectors.py      # reads raw rows back from the DB
+  deals_assembler.py   # reassembles domain models from raw rows
   deals_repository.py  # aggregate read/write repository for the deals graph
-  test_deals.py   # roundtrip: insert fixtures → fetch → assert equality
+  truncator.py         # truncates all sales tables between test runs
+  test_roundtrip.py    # roundtrip: insert fixtures → fetch → assert equality
 ```
 
 `CRMDeal` is the aggregate root tested here. The roundtrip covers the full sales graph: pipelines, stages, organizations, contacts, products, tasks, teams, users, and all bridge tables.
@@ -144,5 +147,6 @@ tests/
 
 Helper scripts for setting up a development environment on a new machine:
 
-- `scripts/config-helix.sh` — configures the Helix editor for this project's stack
+- `scripts/config-helix.sh` — installs the Helix language servers and formatters used here for Bash, TOML, YAML, Docker Compose, and Python
 - `scripts/install-requirements.sh` — installs Python dependencies and the package in editable mode
+- `scripts/integrate.sh` — sets up a venv, installs all dependencies, and runs the full test suite

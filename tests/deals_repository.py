@@ -22,19 +22,20 @@ from deals_assembler import (
     assemble_tasks_by_deal_map,
     assemble_user_map,
 )
-from deleter import delete_all
+from truncator import truncate_all
 from inserters import (
     all_users,
     insert_contacts,
     insert_deals,
     insert_join,
-    insert_named,
-    insert_named_described,
+    insert_loss_reasons,
     insert_organizations,
     insert_pipeline_stages,
     insert_pipelines,
     insert_products,
     insert_tasks,
+    insert_titled,
+    insert_titled_described,
     insert_users,
 )
 from db_selectors import select_all, select_join
@@ -47,11 +48,11 @@ class DealsRepository:
     def add_deals(self, deals: list[CRMDeal]) -> None:
         with self.conn.transaction():
             with self.conn.cursor() as cur:
-                delete_all(cur)
+                truncate_all(cur)
 
                 users = list(all_users(deals))
 
-                insert_named(
+                insert_titled(
                     cur,
                     "crm_industries",
                     [
@@ -62,23 +63,22 @@ class DealsRepository:
                     ],
                 )
                 insert_products(cur, deals)
-                insert_named(
+                insert_loss_reasons(
                     cur,
-                    "crm_loss_reasons",
                     [d.loss_reason.model_dump() for d in deals if d.loss_reason],
                 )
-                insert_named_described(
+                insert_titled_described(
                     cur,
                     "crm_sources",
                     [d.source.model_dump() for d in deals if d.source],
                 )
-                insert_named_described(
+                insert_titled_described(
                     cur,
                     "crm_campaigns",
                     [d.campaign.model_dump() for d in deals if d.campaign],
                 )
                 insert_users(cur, users)
-                insert_named(
+                insert_titled(
                     cur, "crm_teams", [u.team.model_dump() for u in users if u.team]
                 )
                 insert_join(
